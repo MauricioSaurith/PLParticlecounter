@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLP Article Counter · Adidas US</title><meta name="description" content="Browse Adidas US products and download the list in Excel."><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main>
+<header><div class="identity"><span class="logo-frame"><img src="/adidas-logo.png" alt="Adidas" width="544" height="459"></span><h1 class="brand"><a href="/">PLP Article Counter</a></h1></div><span class="market">Adidas US</span></header>
+<section class="intro"><p>Check the total for a category or Product Listing Page, and download the list in Excel if you wish.</p></section>
+<form id="form"><label for="url">Category URL</label><div class="input-row"><input id="url" type="url" required placeholder="https://www.adidas.com/us/men-running-shoes" autocomplete="off"><button id="submit" type="submit">Check</button></div><div class="hint">Adidas US · No filter parameters · <button id="example" type="button" class="text-button">Use running example</button></div></form>
+<p id="message" role="status" aria-live="polite">Paste a link to get started.</p>
+<section id="results" hidden><div class="result-heading"><div><p class="eyebrow">RESULT</p><h2 id="title"></h2><p id="timestamp" class="muted"></p></div><button id="download" disabled>Download Excel</button></div>
+<div class="metrics"><article><p>Reported total</p><strong id="total">—</strong><small>Products in this PLP</small></article><article><p>Products loaded</p><strong id="loaded">0</strong><small id="verified">Checking pages</small></article><article><p>Average price</p><strong id="average">—</strong><small>USD · products loaded</small></article><article><p>On sale</p><strong id="sale">—</strong><small>Among loaded products</small></article></div>
+<div class="progress-row"><progress id="progress" max="100" value="0" aria-label="Products loaded"></progress><button id="cancel" class="text-button" type="button">Cancel</button></div>
+<div class="table-heading"><h3>Products</h3><span id="table-note" class="muted"></span></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>ID</th><th>Price USD</th><th>Discount</th><th>Sport</th><th>Rating</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p class="hint">The Excel file includes all loaded products, listed sizes, color variants, reviews, and links. Color options within a product card are not added to the count.</p></section>
+<footer>Based on code by Truong Huy.</footer>
+</main></body></html>

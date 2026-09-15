@@ -4,7 +4,7 @@ from werkzeug.exceptions import HTTPException
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.worksheet.table import Table, TableStyleInfo
-from scraper import fetch_page, normalize_url, InputError, AdidasError, MAX_PRODUCTS
+from scraper import fetch_page, normalize_url, InputError, AdidasError, MAX_PRODUCTS, MARKETS, market_for_url
 
 app = Flask(__name__, static_folder=None)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
@@ -34,7 +34,7 @@ def page():
     body = request.get_json()
     if not isinstance(body, dict):
         raise InputError('Invalid request.')
-    return jsonify(fetch_page(body.get('url'), body.get('start', 0)))
+    return jsonify(fetch_page(body.get('url'), body.get('start', 0), body.get('market')))
 
 
 def text_cell(sheet, row, column, value):
@@ -51,6 +51,10 @@ def export():
     if not isinstance(data, dict):
         raise InputError('Invalid request.')
     url = normalize_url(data.get('url'))
+    market = market_for_url(url)
+    currency = MARKETS[market]['currency']
+    if data.get('market', market) != market:
+        raise InputError('The export market does not match the URL.')
     rows = data.get('products')
     total = data.get('total')
     if not isinstance(rows, list) or type(total) is not int or not 0 <= total <= MAX_PRODUCTS or len(rows) != total:
@@ -66,11 +70,14 @@ def export():
         text_cell(ws, row, 1, label)
         text_cell(ws, row, 2, str(value) if row != 3 else value)
     for col, (_, name, width) in enumerate(COLUMNS, 1):
+        name = name.replace('USD', currency)
         c = ws.cell(5, col, name)
         c.font = Font(bold=True, color='FFFFFF')
         c.fill = PatternFill('solid', fgColor='132A35')
         ws.column_dimensions[c.column_letter].width = width
     for rn, item in enumerate(rows, 6):
+        if item.get('currency') != currency:
+            raise InputError('Mixed currencies are not allowed in this export.')
         for cn, (key, _, _) in enumerate(COLUMNS, 1):
             value = item.get(key)
             if value is not None and not isinstance(value, (str, int, float)):
@@ -93,7 +100,7 @@ def export():
     buf = BytesIO()
     wb.save(buf)
     buf.seek(0)
-    return send_file(buf, as_attachment=True, download_name='adidas-products.xlsx',
+    return send_file(buf, as_attachment=True, download_name=f'adidas-{market.lower()}-products.xlsx',
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 

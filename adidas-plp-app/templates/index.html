@@ -1,11 +1,13 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLP Article Counter · Adidas US & Canada</title><meta name="description" content="Browse Adidas US and Canada products and download the list in Excel."><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLP Article Counter · Adidas US & Canada</title><meta name="description" content="Browse Adidas US and Canada products and download the list in Excel."><link rel="stylesheet" href="/style.css"><script src="/xlsx.js" defer></script><script src="/history.js" defer></script><script src="/app.js" defer></script></head>
 <body><main>
 <header><div class="identity"><span class="logo-frame"><img src="/adidas-logo.png" alt="Adidas" width="544" height="459"></span><h1 class="brand"><a href="/">PLP Article Counter</a></h1></div><span class="market" id="market-label">Adidas US</span></header>
 <section class="intro"><p>Check the total for a category or Product Listing Page, and download the list in Excel if you wish.</p></section>
-<div class="market-tabs" role="tablist" aria-label="Market"><button id="tab-US" role="tab" aria-selected="true" aria-controls="market-panel" type="button">Adidas US</button><button id="tab-CA" role="tab" aria-selected="false" aria-controls="market-panel" tabindex="-1" type="button">Adidas CA</button></div>
+<div class="view-tabs"><button id="view-products" type="button" aria-pressed="true">Products</button><button id="view-history" type="button" aria-pressed="false">Catalog history</button></div>
+<div id="products-view">
+<div class="market-tabs" role="tablist" aria-label="Market"><button id="tab-US" role="tab" aria-selected="true" aria-controls="market-panel" type="button">Adidas US</button><button id="tab-CA" role="tab" aria-selected="false" aria-controls="market-panel" tabindex="-1" type="button">Adidas CA · EN</button><button id="tab-CA-FR" role="tab" aria-selected="false" aria-controls="market-panel" tabindex="-1" type="button">Adidas CA · FR</button></div>
 <div id="market-panel" role="tabpanel" aria-labelledby="tab-US">
-<form id="form"><label for="url">Category URL</label><div class="input-row"><input id="url" type="url" required placeholder="https://www.adidas.com/us/men-running-shoes" autocomplete="off"><button id="submit" type="submit">Check</button></div><div class="hint"><span id="market-hint">Adidas US</span> · No filter parameters · <button id="example" type="button" class="text-button">Use running example</button></div></form>
+<form id="form"><label for="url">Category or catalog URL</label><div class="input-row"><input id="url" type="url" required placeholder="https://www.adidas.com/us/men-running-shoes" autocomplete="off"><button id="submit" type="submit">Check</button></div><div class="hint"><span id="market-hint">Adidas US</span> · No filter parameters · <button id="example" type="button" class="text-button">Use running example</button> · <button id="catalog-example" type="button" class="text-button">Use full catalog</button></div></form>
 <p id="message" role="status" aria-live="polite">Paste a link to get started.</p>
 <section id="results" hidden><div class="result-heading"><div><p class="eyebrow">RESULT</p><h2 id="title"></h2><p id="timestamp" class="muted"></p></div><button id="download" disabled>Download Excel</button></div>
 <div class="metrics"><article><p>Reported total</p><strong id="total">—</strong><small>Products in this PLP</small></article><article><p>Products loaded</p><strong id="loaded">0</strong><small id="verified">Checking pages</small></article><article><p>Average price</p><strong id="average">—</strong><small id="currency-note">USD · products loaded</small></article><article><p>On sale</p><strong id="sale">—</strong><small>Among loaded products</small></article></div>
@@ -14,5 +16,14 @@
 <div class="table-heading"><h3>Products</h3><span id="table-note" class="muted"></span></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>ID</th><th id="price-header">Price USD</th><th>Discount</th><th>Sport</th><th>Rating</th></tr></thead><tbody id="rows"></tbody></table></div>
 <p class="hint">The Excel file includes all loaded products, listed sizes, color variants, reviews, and links. Color options within a product card are not added to the count.</p></section>
 </div>
+</div>
+<section id="history-view" hidden aria-labelledby="history-title">
+<div class="result-heading"><div><h2 id="history-title">Catalog history</h2><p class="muted">Daily reported totals · Bogotá time · last 12 months</p></div><button id="history-refresh" type="button">Refresh history</button></div>
+<p id="history-status" role="status"></p>
+<div id="history-chart" class="history-chart"></div>
+<p class="hint">US — solid · Canada EN — dashed · Canada FR — dotted. Failed checks create gaps, never zero counts. These are listing totals reported by Adidas, including any sold-out items it lists. EN and FR are separate views and are not added together.</p>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>US</th><th>Canada EN</th><th>Canada FR</th></tr></thead><tbody id="history-rows"></tbody></table></div>
+<p class="hint">To download all product details, use Products → select a market → Use full catalog → Check. Keep that tab open until the list is complete.</p>
+</section>
 <footer>Based on code by Truong Huy.</footer>
 </main></body></html>

@@ -1,5 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "flask",
-  "functions": {"app.py": {"maxDuration": 60, "excludeFiles": "{tests/**,__pycache__/**,.venv/**}"}}
+  "functions": {
+    "app.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{tests/**,__pycache__/**,.venv/**}"
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/catalog-counts",
+      "schedule": "0 13 * * *"
+    }
+  ]
 }

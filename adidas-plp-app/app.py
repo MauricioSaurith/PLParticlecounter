@@ -7,6 +7,9 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from scraper import fetch_page, normalize_url, InputError, AdidasError, MAX_PRODUCTS, MARKETS, market_for_url
 
 app = Flask(__name__, static_folder=None)
+from history import register_history
+register_history(app)
+
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
 COLUMNS = [('id', 'ID', 15), ('name', 'Name', 48), ('subtitle', 'Description', 26),
@@ -24,6 +27,8 @@ def home():
 
 @app.get('/adidas-logo.png')
 @app.get('/app.js')
+@app.get('/xlsx.js')
+@app.get('/history.js')
 @app.get('/style.css')
 def assets():
     return send_from_directory('public', request.path.lstrip('/'))

@@ -6,3 +6,5 @@ __pycache__/
 .vercel/
 .DS_Store
 *.xlsx
+
+!.env.example

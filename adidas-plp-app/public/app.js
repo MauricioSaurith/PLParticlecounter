@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-const markets = {US:{base:'https://www.adidas.com/us/',currency:'USD'},CA:{base:'https://www.adidas.ca/en/',currency:'CAD'}};
+const markets = {US:{base:'https://www.adidas.com/us/',currency:'USD'},CA:{base:'https://www.adidas.ca/en/',currency:'CAD'},'CA-FR':{base:'https://www.adidas.ca/fr/',currency:'CAD'}};
 let selectedMarket='US';
 const money = n => n == null ? '—' : new Intl.NumberFormat('en-US', {style:'currency', currency:markets[selectedMarket].currency}).format(n);
 let state = null, controller = null;
@@ -18,9 +18,9 @@ function render() {
   $('average').textContent=prices.length?money(prices.reduce((a,b)=>a+b,0)/prices.length):'—';
   $('sale').textContent=state.products.filter(p=>p.discount>0).length;
   $('progress').max=Math.max(state.total,1); $('progress').value=state.total?state.products.length:1;
-  $('table-note').textContent=`${state.products.length} products`;
+  $('table-note').textContent=`${state.products.length.toLocaleString()} products loaded · preview shows up to 200 · Excel includes all`;
   const fragment=document.createDocumentFragment();
-  for (const p of state.products) {
+  for (const p of state.products.slice(0,200)) {
     const tr=document.createElement('tr');
     for (const [i,value] of [p.name,p.id,money(p.price),p.discount?`${p.discount}%`:'—',p.sport||'—',p.rating==null?'—':p.rating.toFixed(2)].entries()) {
       const td=document.createElement('td');
@@ -67,6 +67,7 @@ async function consult(url) {
     if(state) $('verified').textContent='Unverified list';
   } finally {for (const key of Object.keys(markets)) $("tab-"+key).disabled=false; controller=null; $('submit').disabled=false; $('example').disabled=false; $('url').disabled=false; $('cancel').hidden=true;}
 }
+$('catalog-example').addEventListener('click',()=>{$('url').value=markets[selectedMarket].base+'search'; $('url').focus();});
 $('form').addEventListener('submit',e=>{e.preventDefault();consult($('url').value.trim());});
 $('example').addEventListener('click',()=>{$('url').value=markets[selectedMarket].base+'men-running-shoes'; $('url').focus();});
 $('cancel').addEventListener('click',()=>controller?.abort());
@@ -74,7 +75,7 @@ $('download').addEventListener('click',async()=>{
   $('download').disabled=true;
   const exportMarket=selectedMarket;
   try {
-    const blob=await api('/api/export',state); const url=URL.createObjectURL(blob);
+    const blob=catalogWorkbook(state); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url;a.download=`adidas-${exportMarket.toLowerCase()}-products.xlsx`;a.click();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(error){message(error.message,true);}
@@ -89,7 +90,7 @@ function selectMarket(key) {
     $('tab-'+market).tabIndex=market===key?0:-1;
   }
   $('market-panel').setAttribute('aria-labelledby','tab-'+key);
-  $('market-label').textContent=$('market-hint').textContent='Adidas '+key;
+  $('market-label').textContent=$('market-hint').textContent=key==='CA-FR'?'Adidas CA · French':key==='CA'?'Adidas CA · English':'Adidas US';
   $('currency-note').textContent=markets[key].currency+' · products loaded';
   $('price-header').textContent='Price '+markets[key].currency;
   $('url').value=''; $('url').placeholder=markets[key].base+'men-running-shoes';
@@ -100,7 +101,7 @@ for(const key of Object.keys(markets)) {
   $('tab-'+key).addEventListener('click',()=>selectMarket(key));
   $('tab-'+key).addEventListener('keydown',e=>{
     if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) {
-      e.preventDefault(); const next=e.key==='Home'?'US':e.key==='End'?'CA':key==='US'?'CA':'US';
+      e.preventDefault(); const next=e.key==='Home'?'US':e.key==='End'?'CA-FR':Object.keys(markets)[(Object.keys(markets).indexOf(key)+(e.key==='ArrowRight'?1:2))%3];
       selectMarket(next); $('tab-'+next).focus();
     }
   });
